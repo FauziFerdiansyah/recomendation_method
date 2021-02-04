@@ -1,0 +1,8 @@
+.has-error input {
+    border-color: #dc3545;
+}
+.has-error .help-block {
+    width: 100%;
+    margin-top: .25rem;
+    font-size: 80%;
+}
