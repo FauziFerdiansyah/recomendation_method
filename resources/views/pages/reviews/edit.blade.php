@@ -14,10 +14,12 @@
         @include('common.notif')
         <form action="{{ route('review_update', $data->id) }}" role="form" method="post">
           <input type="hidden" name="_token" value="{{ Session::token() }}">
+          <input type="hidden" name="customer_id" value="{{$data->customer_id}}">
+          <input type="hidden" name="product_id" value="{{$data->product_id}}">
           <div class="row">
             <div class="col-md-9 form-group {{ $errors->has('customer_id') ? 'has-error' : '' }}">
               <label for="name_Input">Customer</label>
-              <select class="CustomerID form-control input-lg" style="width:500px;" name="customer_id" autofocus required>
+              <select class="CustomerID form-control input-lg" style="width:500px;" name="customer_id_edit" autofocus required>
                 <option value="{{$data->customer_id}}">{{$data->customer_name}}</option>
               </select>
               @if ($errors->has('customer_id'))
@@ -30,7 +32,7 @@
           <div class="row">
             <div class="col-md-9 form-group {{ $errors->has('product_id') ? 'has-error' : '' }}">
               <label for="name_Input">Product</label>
-              <select class="ProductID form-control input-lg" style="width:500px;" name="product_id" required>
+              <select class="ProductID form-control input-lg" style="width:500px;" name="product_id_edit" required>
                 <option value="{{$data->product_id}}">{{$data->product_name}}</option>
               </select>
               @if ($errors->has('product_id'))

@@ -70,7 +70,7 @@ Data Product
                         'aTargets': [0]
                     },
                     {
-                        'sWidth': '8%',
+                        'sWidth': '12%',
                         'aTargets':[1]
                     },
                     {

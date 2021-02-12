@@ -180,7 +180,17 @@ class ProductController extends Controller
                     ";
                 })
                 ->edit_column('image', function($r_data) {
-                    return "<img src='".asset('/img/products/'.$r_data->image)."' class='img rounded mx-auto d-block' width='100px' alt='".$r_data->product_name."'>";
+                    $roundRating = ($r_data->total_rating != 0)?round($r_data->total_rating / $r_data->total_vote):0;
+                    $rating = "";
+                    for ($x = 1; $x <= 5; $x++) {
+                        if($x > $roundRating){
+                            $rating .= '<li class="list-inline-item mr-1"><i class="fa fa-star-o text-warning"></i></li>';
+                        }else{
+                            $rating .= '<li class="list-inline-item mr-1"><i class="fa fa-star text-warning"></i></li>';
+                        }
+                    }
+                    return "<img src='".asset('/img/products/'.$r_data->image)."' class='img rounded mx-auto d-block' width='100%' alt='".$r_data->product_name."'>
+                    <div class='mx-auto d-block mt-2 text-center'>".$rating." <small>(".number_format_short($r_data->total_vote).")</small>"."</div>";
                 })
                 ->edit_column('updated_at', function($r_data) {
                     return date( 'F d, Y h:i:s', strtotime( $r_data->updated_at ));

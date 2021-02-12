@@ -11,6 +11,7 @@ use DB;
 use Validator;
 use Yajra\Datatables\Datatables;
 use App\Review;
+use App\Product;
 class ReviewController extends Controller
 {
 
@@ -47,9 +48,14 @@ class ReviewController extends Controller
                 $data->created_by   = Auth::user()->id;
                 $data->updated_by   = Auth::user()->id;
                 if ($data->save()) {
+                    $this->updateRating(
+                        $request->input('product_id'), $request->input('rating'), 1
+                    );
                     return redirect()
                         ->route('review_create')
-                        ->with('alt_green', 'Data has been saved.');
+                        ->with('alt_green', 'Data has been saved.');  
+                    
+                    
                 }else{
                     return redirect()
                         ->route('review_create')
@@ -62,6 +68,36 @@ class ReviewController extends Controller
                     ->withInput()
                     ->withErrors($validation->errors());
             }
+        }
+    }
+
+    private function updateRating($id_product, $rating, $type) {
+            $get_review_count = DB::table('reviews')->where('product_id', $id_product)->count();
+
+            $getCountVote = ($get_review_count > 0)? $get_review_count : 0;
+            $get_product = DB::table('products')
+                    ->where('id', $id_product)->first();
+        if($type == 1){ // Add
+            Product::where('id', $id_product)
+            ->update(
+                [
+                    'total_vote'    => ($getCountVote),
+                    'total_rating'  => ($get_product->total_rating + $rating)
+                ]);
+        }elseif($type == 2){ // Edit
+            Product::where('id', $id_product)
+            ->update(
+                [
+                    'total_vote'    => ($getCountVote),
+                    'total_rating'  => ($rating)
+                ]);
+        }else{
+            Product::where('id', $id_product)
+            ->update(
+                [
+                    'total_vote'    => ($getCountVote),
+                    'total_rating'  => ($get_product->total_rating - $rating)
+                ]);
         }
     }
 
@@ -92,6 +128,8 @@ class ReviewController extends Controller
         if ($validation->passes())
         {
             $data   = Review::findOrFail($id);
+            $before_rating_update = $data->rating;
+            $get_rating_before_product = DB::table('products')->where('id', $request->input('product_id'))->first();
             Review::where('id', $data->id)
                 ->update(
                     [
@@ -101,6 +139,11 @@ class ReviewController extends Controller
                         'note'          => $request->input('note'),
                         'updated_by'    => Auth::user()->id
                     ]);
+            
+            $countRatng = $get_rating_before_product->total_rating - $before_rating_update + $request->input('rating');
+            $this->updateRating(
+                $request->input('product_id'), $countRatng, 2
+            );
             return redirect()
                 ->route('review_index')
                 ->with('alt_green', 'Data has been saved.');
@@ -173,6 +216,7 @@ class ReviewController extends Controller
     public function ajaxDelete($id)
     {
         $data = Review::findOrFail($id);
+        $data_rating = $data->rating;
         if($data == null) {
             return response()->json([
                 'status' => false,
@@ -181,7 +225,10 @@ class ReviewController extends Controller
                 'success' => false
             ], 200);
         }else if(Review::destroy($id)) {
-          return response()->json([
+            $this->updateRating(
+                $data->product_id, $data_rating, 3
+            );
+            return response()->json([
                 'status' => true,
                 'message' => "Review has been deleted.",
                 'code' => 200,
