@@ -10,36 +10,38 @@ use Auth;
 use DB;
 use Validator;
 use Yajra\Datatables\Datatables;
-use App\Category;
-class CategoryController extends Controller
+use App\Customer;
+class CustomerController extends Controller
 {
 
     public function index()
     {
-        return view('pages.categories.index');
+        return view('pages.customers.index');
     }
 
     public function create()
     {
-        return view('pages.categories.create');
+        return view('pages.customers.create');
     }
 
     public function store(Request $request)
     {
         $input = $request->all();
-        $validation     = Validator::make($input, Category::$rules);
+        $validation     = Validator::make($input, Customer::$rules);
         if ($validation->passes()) {
-            $data   = new Category;
-            $data->name   = $request->input('name');
-            $data->created_by   = Auth::user()->id;
-            $data->updated_by   = Auth::user()->id;
+            $data   = new Customer;
+            $data->name         = $request->input('name');
+            $data->email        = $request->input('email');
+            $data->gender       = $request->input('gender');
+            $data->phone        = $request->input('phone');
+
             if ($data->save()) {
                 return redirect()
-                    ->route('category_create')
+                    ->route('customer_create')
                     ->with('alt_green', 'Data has been saved.');
             }else{
                 return redirect()
-                    ->route('category_create')
+                    ->route('customer_create')
                     ->withInput()
                     ->withErrors($validation->errors());
             }            
@@ -53,26 +55,28 @@ class CategoryController extends Controller
 
     public function edit($id)
     {
-        $data = Category::findOrFail($id);
-        return view('pages.categories.edit')
+        $data = Customer::findOrFail($id);
+        return view('pages.customers.edit')
             ->with(compact('data'));
     }
 
     public function update(Request $request, $id)
     {
         $input = $request->all();
-        $validation = Validator::make($request->all(), Category::rule_edit($id));
+        $validation = Validator::make($request->all(), Customer::rule_edit($id));
         if ($validation->passes())
         {
-            $data   = Category::findOrFail($id);
-            Category::where('id', $data->id)
+            $data   = Customer::findOrFail($id);
+            Customer::where('id', $data->id)
                 ->update(
                     [
                         'name'    => $request->input('name'),
-                        'updated_by'    => Auth::user()->id
+                        'email'    => $request->input('email'),
+                        'gender'    => $request->input('gender'),
+                        'phone'    => $request->input('phone')
                     ]);
             return redirect()
-                ->route('category_index')
+                ->route('customer_index')
                 ->with('alt_green', 'Data has been saved.');
 
         }else{
@@ -91,11 +95,14 @@ class CategoryController extends Controller
 
     public function getDatatable()
     {
-        $data   = DB::table('categories')
+        $data   = DB::table('customers')
                     ->select(
                         [
                             'id as data_id',
                             'name',
+                            'email',
+                            'phone',
+                            'gender',
                             'updated_at'
                         ]
                     )->orderBy('updated_at', 'desc');
@@ -107,8 +114,8 @@ class CategoryController extends Controller
                         <i class="ti-settings m-r-5"></i> Action
                         </button>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item text-info" href="'.route('category_edit', $r_data->data_id).'"><span class="ti-pencil mr-2"></span> Edit</a>
-                            <a class="dropdown-item text-danger" href="javascript:void(0)" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#delete_form' . $r_data->data_id . '" onclick="deleteModal(' . "'" . route('category_destroy', $r_data->data_id) . "','" . $r_data->data_id . "','" . $r_data->name . "','" . Session::token() . "'" . ')"><span class="ti-trash mr-2"></span> Delete</a>
+                            <a class="dropdown-item text-info" href="'.route('customer_edit', $r_data->data_id).'"><span class="ti-pencil mr-2"></span> Edit</a>
+                            <a class="dropdown-item text-danger" href="javascript:void(0)" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#delete_form' . $r_data->data_id . '" onclick="deleteModal(' . "'" . route('customer_destroy', $r_data->data_id) . "','" . $r_data->data_id . "','" . $r_data->name . "','" . Session::token() . "'" . ')"><span class="ti-trash mr-2"></span> Delete</a>
                         </div>
                         <div id="area_modal' . $r_data->data_id . '"></div>
                     </div>
@@ -116,6 +123,9 @@ class CategoryController extends Controller
                 })
                 ->edit_column('data_id', function($r_data) {
                     return "<strong>".$r_data->data_id."</strong>";
+                })
+                ->edit_column('gender', function($r_data) {
+                    return ($r_data->gender == 1)? "<strong>Male</strong>" : "<strong>Female</strong>";
                 })
                 ->edit_column('updated_at', function($r_data) {
                     return date( 'F d, Y h:i:s', strtotime( $r_data->updated_at ));
@@ -126,7 +136,7 @@ class CategoryController extends Controller
 
     public function ajaxDelete($id)
     {
-        $data = Category::findOrFail($id);
+        $data = Customer::findOrFail($id);
         if($data == null) {
             return response()->json([
                 'status' => false,
@@ -134,7 +144,7 @@ class CategoryController extends Controller
                 'code' => 200,
                 'success' => false
             ], 200);
-        }else if(Category::destroy($id)) {
+        }else if(Customer::destroy($id)) {
           return response()->json([
                 'status' => true,
                 'message' => "<b>".$data->name."</b>" . " has been deleted.",
@@ -150,6 +160,29 @@ class CategoryController extends Controller
             ], 200);
 
         }
+    }
+
+    // Ajax Search Customer Select 2
+    public function ajaxSearchCustomer(Request $request)
+    {
+
+        $search = $request->input('key.term');
+        $cust = Customer::where('customers.name', 'LIKE','%'.$search.'%')
+
+        ->select('customers.id','customers.name')
+        ->orderBy('customers.name', 'asc')
+        ->limit(6)
+        ->get();
+
+        $array_data_json = [];
+        foreach ($cust as $key => $r) {
+            $array_data_json[] = [          
+                                    'value' => $r->id,
+                                    'name' => $r->name
+                                ];
+        }
+        return response()
+        ->json($array_data_json);
     }
 
 }

@@ -20,7 +20,7 @@ Data Category
                     <h6 class="card-title">Table Category</h6>
                     <div>
                         <a href="{{route('category_create')}}" class="btn btn-outline-primary btn-sm btn-uppercase">
-                            <i class="ti-plus mr-2"></i> Add New User
+                            <i class="ti-plus mr-2"></i> Add New Category
                         </a>
                     </div>
                 </div>
@@ -61,7 +61,6 @@ Data Category
                 stateSave : true, 
                 processing: true,
                 ajax: '{!! route('datatables.categories') !!}',
-                order: [[0, "desc" ]],
                 aoColumnDefs: [
                     {
                         'bVisible': true,
@@ -81,10 +80,11 @@ Data Category
                 columns: [
                     { data: 'data_id', name: 'categories.data_id', searchable:false,visible: true},
                     { data: 'name', name: 'categories.name' },
-                    { data: 'updated_at', name: 'users.updated_at' },
+                    { data: 'updated_at', name: 'categories.updated_at' },
                     { data: 'actions', name: 'actions',"searchable": false ,'orderable' : false },
                 ],
             });
+            $("#tables_wrapper #tables_length label").append('<button type="button" class="btn btn-outline-primary btn-sm btn-rounded ml-2" onclick="table.ajax.reload(null);"><i class="fa fa-refresh"></i></button>');
         });
     </script>
 @endpush

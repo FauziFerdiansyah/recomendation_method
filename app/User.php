@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name' => 'required',
         'email' => 'required|email|unique:users,email',
         'password' => 'required|min:5|confirmed',
+        'status' => 'required',
     ];
 
     public static function rule_edit($id)
@@ -29,6 +30,7 @@ class User extends Authenticatable
         return array(
             'name' => 'required',
             'email' => 'required|email|unique:users,email,'.$id,
+            'status' => 'required',
         );
     }
 

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title_web')
-Data Users
+Data Review
 @endsection
 
 @section('content')
@@ -17,10 +17,10 @@ Data Users
                     @include('common.notif')
                 </div>
                 <div class="d-flex justify-content-between">
-                    <h6 class="card-title">Table Users</h6>
+                    <h6 class="card-title">Table Review</h6>
                     <div>
-                        <a href="{{route('user_create')}}" class="btn btn-outline-primary btn-sm btn-uppercase">
-                            <i class="ti-plus mr-2"></i> Add New User
+                        <a href="{{route('review_create')}}" class="btn btn-outline-primary btn-sm btn-uppercase">
+                            <i class="ti-plus mr-2"></i> Add New Review
                         </a>
                     </div>
                 </div>
@@ -29,9 +29,9 @@ Data Users
                         <thead>
                             <tr>
                                 <th>Id</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Status</th>
+                                <th>Product Name</th>
+                                <th>Rating</th>
+                                <th>Reviewers</th>
                                 <th>Updated</th>
                                 <th>Action</th>
                             </tr>
@@ -62,45 +62,33 @@ Data Users
                 responsive: true,
                 stateSave : true, 
                 processing: true,
-                ajax: '{!! route('datatables.users') !!}',
+                ajax: '{!! route('datatables.reviews') !!}',
                 aoColumnDefs: [
                     {
                         'bVisible': true,
+                        'sWidth': '5%',
                         'aTargets': [0]
                     },
                     {
-                        'sWidth': '3%',
-                        'aTargets':[0]
-                    },
-                    {
-                        'sWidth': '5%',
-                        'aTargets':[-1]
-                    },
-                    {
-                        'sWidth': '25%',
-                        'aTargets':[2]
-                    },
-                    {
-                        'sWidth': '10%',
-                        'aTargets':[-3,3, 2]
+                        'sWidth': '26%',
+                        'aTargets':[1,3]
                     },
                     {
                         'sWidth': '20%',
                         'aTargets':[-2]
                     },
                     {
-                        'sWidth': '10%',
-                        'aTargets':[-3]
-                    }
-                    
+                        'sWidth': '5%',
+                        'aTargets':[-1]
+                    } 
                 ],              
 
                 columns: [
-                    { data: 'data_id', name: 'users.data_id', searchable:false,visible: true},
-                    { data: 'user_name', name: 'users.name' },
-                    { data: 'email', name: 'users.email' },
-                    { data: 'status', name: 'users.status', searchable: false, sClass: 'text-center' },
-                    { data: 'updated_at', name: 'users.updated_at' },
+                    { data: 'data_id', name: 'reviews.data_id', searchable:false,visible: true},
+                    { data: 'product_name', name: 'products.product_name' },
+                    { data: 'rating', name: 'reviews.rating',"searchable": false ,'orderable' : false },
+                    { data: 'customer_name', name: 'customers.customer_name' },
+                    { data: 'updated_at', name: 'reviews.updated_at' },
                     { data: 'actions', name: 'actions',"searchable": false ,'orderable' : false },
                 ],
             });

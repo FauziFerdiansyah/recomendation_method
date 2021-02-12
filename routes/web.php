@@ -128,5 +128,129 @@ Route::group(['prefix' => 'admin'], function() {
           ]);
         });
 
+        Route::group(['prefix' => 'products'], function(){
+          Route::get('/datatables/products', [
+            'uses'  => 'ProductController@getDatatable',
+            'as'  => 'datatables.products'
+          ]);
+          // ajax delete
+          Route::get('/delete/{id}', [
+            'uses'  => 'ProductController@ajaxDelete',
+            'as'  => 'product_destroy'
+          ]);
+          
+          // /admin/products
+          Route::get('/', [
+            'uses'  => 'ProductController@index',
+            'as'  => 'product_index'
+          ]);
+          // /admin/products/create :GET
+          Route::get('/create',[
+            'uses'  => 'ProductController@create',
+            'as'  => 'product_create'
+          ]);
+          // /admin/products/create :POST
+          Route::post('/create', [
+            'uses'  => 'ProductController@store',
+            'as'  => 'product_store'
+          ]);
+          // /admin/products/edit{id} :GET
+          Route::get('/edit/{id}', [
+            'uses'  => 'ProductController@edit',
+            'as'  => 'product_edit'
+          ]);
+          // /admin/products/edit{id} :POST
+          Route::post('/edit/{id}', [
+            'uses'  => 'ProductController@update',
+            'as'  => 'product_update'
+          ]);
+          // AJAX :::::
+          Route::post('/product_search',[
+            'uses'  => 'ProductController@ajaxSearchProduct',
+            'as'  => 'product_search'
+          ]);
+        });
+
+        Route::group(['prefix' => 'customers'], function(){
+          Route::get('/datatables/customers', [
+            'uses'  => 'CustomerController@getDatatable',
+            'as'  => 'datatables.customers'
+          ]);
+          // ajax delete
+          Route::get('/delete/{id}', [
+            'uses'  => 'CustomerController@ajaxDelete',
+            'as'  => 'customer_destroy'
+          ]);
+          
+          // /admin/customers
+          Route::get('/', [
+            'uses'  => 'CustomerController@index',
+            'as'  => 'customer_index'
+          ]);
+          // /admin/customers/create :GET
+          Route::get('/create',[
+            'uses'  => 'CustomerController@create',
+            'as'  => 'customer_create'
+          ]);
+          // /admin/customers/create :POST
+          Route::post('/create', [
+            'uses'  => 'CustomerController@store',
+            'as'  => 'customer_store'
+          ]);
+          // /admin/customers/edit{id} :GET
+          Route::get('/edit/{id}', [
+            'uses'  => 'CustomerController@edit',
+            'as'  => 'customer_edit'
+          ]);
+          // /admin/customers/edit{id} :POST
+          Route::post('/edit/{id}', [
+            'uses'  => 'CustomerController@update',
+            'as'  => 'customer_update'
+          ]);
+          // AJAX :::::
+          Route::post('/customer_search',[
+            'uses'  => 'CustomerController@ajaxSearchCustomer',
+            'as'  => 'customer_search'
+          ]);
+        });
+
+        Route::group(['prefix' => 'reviews'], function(){
+          Route::get('/datatables/reviews', [
+            'uses'  => 'ReviewController@getDatatable',
+            'as'  => 'datatables.reviews'
+          ]);
+          // ajax delete
+          Route::get('/delete/{id}', [
+            'uses'  => 'ReviewController@ajaxDelete',
+            'as'  => 'review_destroy'
+          ]);
+          
+          // /admin/reviews
+          Route::get('/', [
+            'uses'  => 'ReviewController@index',
+            'as'  => 'review_index'
+          ]);
+          // /admin/reviews/create :GET
+          Route::get('/create',[
+            'uses'  => 'ReviewController@create',
+            'as'  => 'review_create'
+          ]);
+          // /admin/reviews/create :POST
+          Route::post('/create', [
+            'uses'  => 'ReviewController@store',
+            'as'  => 'review_store'
+          ]);
+          // /admin/reviews/edit{id} :GET
+          Route::get('/edit/{id}', [
+            'uses'  => 'ReviewController@edit',
+            'as'  => 'review_edit'
+          ]);
+          // /admin/reviews/edit{id} :POST
+          Route::post('/edit/{id}', [
+            'uses'  => 'ReviewController@update',
+            'as'  => 'review_update'
+          ]);
+        });
+
     }); // end middle auth
 });

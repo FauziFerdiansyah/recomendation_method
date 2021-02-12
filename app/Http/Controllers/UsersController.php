@@ -213,7 +213,7 @@ class UsersController extends Controller
                                 'users.status',
                                 'users.updated_at'
                             ]
-                        );
+                        )->orderBy('updated_at', 'desc');
                         //->where('users.status', 2);
                         //->where('users.id', '!=', Auth::user()->id);
         return Datatables::of($get_data)
