@@ -31,6 +31,11 @@
                 <i class="mr-2" data-feather="star"></i> Reviews
             </a>
         </li>
+        <li class="{{ Request::segment(2) === 'methods' ? 'open' : '' }}">
+            <a href="{{ route('method_index') }}">
+                <i class="mr-2" data-feather="airplay"></i> Calculation
+            </a>
+        </li>
     </ul>
 </div>
 <!-- end::navigation -->

@@ -252,5 +252,13 @@ Route::group(['prefix' => 'admin'], function() {
           ]);
         });
 
+        Route::group(['prefix' => 'methods'], function(){
+          // /admin/methods
+          Route::get('/', [
+            'uses'  => 'MethodController@index',
+            'as'  => 'method_index'
+          ]);
+        });
+
     }); // end middle auth
 });

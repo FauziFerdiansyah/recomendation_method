@@ -71,36 +71,6 @@ class ReviewController extends Controller
         }
     }
 
-    private function updateRating($id_product, $rating, $type) {
-            $get_review_count = DB::table('reviews')->where('product_id', $id_product)->count();
-
-            $getCountVote = ($get_review_count > 0)? $get_review_count : 0;
-            $get_product = DB::table('products')
-                    ->where('id', $id_product)->first();
-        if($type == 1){ // Add
-            Product::where('id', $id_product)
-            ->update(
-                [
-                    'total_vote'    => ($getCountVote),
-                    'total_rating'  => ($get_product->total_rating + $rating)
-                ]);
-        }elseif($type == 2){ // Edit
-            Product::where('id', $id_product)
-            ->update(
-                [
-                    'total_vote'    => ($getCountVote),
-                    'total_rating'  => ($rating)
-                ]);
-        }else{
-            Product::where('id', $id_product)
-            ->update(
-                [
-                    'total_vote'    => ($getCountVote),
-                    'total_rating'  => ($get_product->total_rating - $rating)
-                ]);
-        }
-    }
-
     public function edit($id)
     {
         $data = Review::findOrFail($id);
@@ -153,6 +123,36 @@ class ReviewController extends Controller
                 ->back()
                 ->withInput()
                 ->withErrors($validation->errors());
+        }
+    }
+
+    private function updateRating($id_product, $rating, $type) {
+            $get_review_count = DB::table('reviews')->where('product_id', $id_product)->count();
+
+            $getCountVote = ($get_review_count > 0)? $get_review_count : 0;
+            $get_product = DB::table('products')
+                    ->where('id', $id_product)->first();
+        if($type == 1){ // Add
+            Product::where('id', $id_product)
+            ->update(
+                [
+                    'total_vote'    => ($getCountVote),
+                    'total_rating'  => ($get_product->total_rating + $rating)
+                ]);
+        }elseif($type == 2){ // Edit
+            Product::where('id', $id_product)
+            ->update(
+                [
+                    'total_vote'    => ($getCountVote),
+                    'total_rating'  => ($rating)
+                ]);
+        }else{
+            Product::where('id', $id_product)
+            ->update(
+                [
+                    'total_vote'    => ($getCountVote),
+                    'total_rating'  => ($get_product->total_rating - $rating)
+                ]);
         }
     }
 
