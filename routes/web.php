@@ -258,6 +258,11 @@ Route::group(['prefix' => 'admin'], function() {
             'uses'  => 'MethodController@index',
             'as'  => 'method_index'
           ]);
+           // /admin/categories/create :POST
+           Route::post('/create', [
+            'uses'  => 'MethodController@store',
+            'as'  => 'method_store'
+          ]);
         });
 
     }); // end middle auth

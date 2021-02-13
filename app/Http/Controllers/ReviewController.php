@@ -127,11 +127,11 @@ class ReviewController extends Controller
     }
 
     private function updateRating($id_product, $rating, $type) {
-            $get_review_count = DB::table('reviews')->where('product_id', $id_product)->count();
+        $get_review_count = DB::table('reviews')->where('product_id', $id_product)->count();
 
-            $getCountVote = ($get_review_count > 0)? $get_review_count : 0;
-            $get_product = DB::table('products')
-                    ->where('id', $id_product)->first();
+        $getCountVote = ($get_review_count > 0)? $get_review_count : 0;
+        $get_product = DB::table('products')
+                ->where('id', $id_product)->first();
         if($type == 1){ // Add
             Product::where('id', $id_product)
             ->update(

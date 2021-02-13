@@ -12,7 +12,7 @@ Create New Review
       <div class="card-body">       
         <!-- AREA NOTIF -->
         @include('common.notif')
-        <form action="{{ route('review_store') }}" role="form" method="post">
+        <form action="{{ route('method_store') }}" role="form" method="post">
           <input type="hidden" name="_token" value="{{ Session::token() }}">
           <div class="row">
             <div class="col-md-9 form-group {{ $errors->has('customer_id') ? 'has-error' : '' }}">
