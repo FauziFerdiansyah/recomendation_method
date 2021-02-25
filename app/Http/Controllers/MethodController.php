@@ -9,6 +9,7 @@ use Session;
 use Auth;
 use DB;
 use App\Similarity;
+use App\Product;
 
 class MethodController extends Controller
 {
@@ -84,7 +85,7 @@ class MethodController extends Controller
         foreach($fullProduct as $r){
             $dataProductUp[] = $r->product_id;
         }
-        $tableSimilarity[] = array_merge(["&nbsp;&nbsp;"],$dataProductUp);
+        $tableSimilarity[] = array_merge(['#'],$dataProductUp);
         foreach($fullProduct as $r1){
             $dataTableSimilarity = [];
             foreach($fullProduct as $r2){
@@ -102,10 +103,6 @@ class MethodController extends Controller
             $tableSimilarity[] = array_merge([$r1->product_id],$dataTableSimilarity);
         }
 
-        // hasil akhir similarity
-        echo "<pre>";
-        print_r($tableSimilarity);
-        echo "</pre>";
 
 		/*----------- Menghitung Prediksi -----------*/
 		$dataProduct = DB::select(DB::raw("
@@ -119,7 +116,7 @@ class MethodController extends Controller
 				r.product_id IS NULL
 		"));
 
-        $arrayPrediksi = [];
+        $arrayPrediksi = '<table class="table table-small table-bordered table-hover"><tr><th>Product Name</th><th>Prediction</th></tr>';
 		foreach($dataProduct as $value){
 			$prediction = DB::select(DB::raw("
 			SELECT
@@ -133,17 +130,52 @@ class MethodController extends Controller
 				(s.product_id_1 = ".$value->product_id." AND  s.product_id_2 = r.product_id) XOR (s.product_id_1 = r.product_id AND s.product_id_2 = ".$value->product_id.")
                 AND s.similarity >= 0
 			"));
-            $arrayPrediksi[] = [
-                'product_id' => $value->product_id,
-                'prediksi' => $prediction[0]->prediction
-            ];
+            // $arrayPrediksi[] = [
+            //     'product_id' => $value->product_id,
+            //     'prediksi' => $prediction[0]->prediction
+            // ];
+            $arrayPrediksi .= '<tr><td>'.$this->getprdName($value->product_id).'</td><td>'.$prediction[0]->prediction.'</td></tr>';
 		}
+        $arrayPrediksi .= '</table>';
 
-        // hasil akhir prediksi
-        echo "<pre>";
-        print_r($arrayPrediksi);
-        echo "</pre>";
+        if($tableSimilarity){
+            $arraySimilarity = '';
+            $no = 1;
+            foreach ($tableSimilarity as $keyth => $th) {
+                $arr_th_sm = '';
+                $no2 = 1;
+                foreach($th as $r){
 
+                    if($no == 1 || $no2 == 1){
+                        $arr_th_sm .= '<th>'.$this->getprdName($r).'</th>';
+                    }else{
+                        $arr_th_sm .= '<td>'.$r.'</td>';
+                    }
+                    $no2++;
+                }
+                $arraySimilarity .= '<tr>'.$arr_th_sm.'</tr>';
+                $no++;
+            }
+            
+            return response()->json(
+                [
+                    'status'            => 'Success',
+                    'table_similarity'  => '<table class="table table-small table-bordered table-hover">'.$arraySimilarity.'</table>',
+                    'table_prediction'  => $arrayPrediksi,
+                ],
+                200
+            );
+        }
+    }
+
+    function getprdName($id) {
+        if(!empty($id) && $id != "#"){
+            $data = DB::table('products')->select('name')->where('id', $id)->first()->name;
+        }else{
+            $data = "#";
+        }
+        
+        return $data;
     }
 
 }

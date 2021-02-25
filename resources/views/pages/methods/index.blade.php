@@ -7,39 +7,63 @@ Create New Review
 @section('content')
 
 <div class="row">
-  <div class="offset-md-3 col-md-6">
+  <div class="col-md-12">
     <div class="card">
       <div class="card-body">       
         <!-- AREA NOTIF -->
         @include('common.notif')
-        <form action="{{ route('method_store') }}" role="form" method="post">
+        <form class="form-inline" id="form-data">
           <input type="hidden" name="_token" value="{{ Session::token() }}">
-          <div class="row">
-            <div class="col-md-9 form-group {{ $errors->has('customer_id') ? 'has-error' : '' }}">
-              <label for="name_Input">Customer</label>
-              <select class="CustomerID form-control input-lg" style="width:500px;" name="customer_id" autofocus required></select>
+            <div class="form-group mb-2 col-md-5 px-sm-0 px-0 px-md-1">
+              <label for="name_Input" class="sr-only">Customer</label>
+              <select class="CustomerID form-control input-lg" name="customer_id" autofocus required></select>
               @if ($errors->has('customer_id'))
                 <span class="help-block">
                     {{ $errors->first('customer_id') }}
                 </span>
               @endif
             </div>
-          </div>
-          <div class="row">
-            <div class="col-md-9 form-group {{ $errors->has('product_id') ? 'has-error' : '' }}">
-              <label for="name_Input">Product</label>
-              <select class="ProductID form-control input-lg" style="width:500px;" name="product_id" required></select>
+            <div class="form-group mb-2 col-md-5 px-sm-0 px-0 px-md-1">
+              <label for="name_Input" class="sr-only">Product</label>
+              <select class="ProductID form-control input-lg" name="product_id" required></select>
               @if ($errors->has('product_id'))
                 <span class="help-block">
                     {{ $errors->first('product_id') }}
                 </span>
               @endif
             </div>
-          </div>
-          <button type="submit" class="btn btn-primary">Get Recomendation</button>
+          <button type="button" class="btn btn-primary mb-2 ml-sm-0 ml-0 ml-md-1" onclick="execMethod()">Get Recomendation</button>
         </form>
 
       </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="d-block">
+                <h6 class="card-title mb-3">Similarity Product</h6>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="table-responsive" id="table-similarity">
+                      <center>Data is empety</center>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="d-block">
+                <h6 class="card-title mb-3">Prediction</h6>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="table-responsive" id="table-prediction">
+                      <center>Data is empety</center>
+                    </div> 
+                </div>
+            </div>
+        </div>
     </div>
   </div>
 </div>
@@ -133,6 +157,27 @@ Create New Review
         $("#rating-star-"+ix).toggleClass('btn-outline-warning');
         }
       }));
+
+      function execMethod() {
+          $.ajax({
+            url: "{{ route('method_store') }}",
+            type: "POST",
+            dataType: 'json',
+            data: $('#form-data').serialize(),
+            beforeSend: function() {
+                
+            }
+          }).done(function (data, textStatus, jqXHR){
+            if(data.table_similarity){
+              $('#table-similarity').html(data.table_similarity);
+            }
+            if(data.table_prediction){
+              $('#table-prediction').html(data.table_prediction);
+            }
+          })
+          .fail()
+          .always();
+      }
     </script>
 @endpush
 
