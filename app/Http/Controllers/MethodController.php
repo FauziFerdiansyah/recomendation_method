@@ -138,12 +138,11 @@ class MethodController extends Controller
             $arrayPrediksi .= '<tr><td>'.$this->getprdName($value->product_id).'</td><td>'.$prediction[0]->prediction.'</td></tr>';
 		}
         $arrayPrediksi .= '</table>';
-
-        /*--------------- Menghitung MAE ---------------*/
-        $MAE = $this->hitungMAE(['id'=>$request->input('customer_id')],$request->input('product_id'));
         
         /*--------------- Menghitung rata-rata MAE ---------------*/
         $averageMAE = $this->hitungMAE([],'');
+        /*--------------- Menghitung MAE ---------------*/
+        $MAE = $this->hitungMAE(['id'=>$request->input('customer_id')],$request->input('product_id'));
 
         /*--------------- Menampilkan Data -------------*/
         if($tableSimilarity){
