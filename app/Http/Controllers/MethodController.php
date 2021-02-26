@@ -10,6 +10,7 @@ use Auth;
 use DB;
 use App\Similarity;
 use App\Product;
+use App\Prediction;
 
 class MethodController extends Controller
 {
@@ -138,6 +139,13 @@ class MethodController extends Controller
 		}
         $arrayPrediksi .= '</table>';
 
+        /*--------------- Menghitung MAE ---------------*/
+        $MAE = $this->hitungMAE(['id'=>$request->input('customer_id')],$request->input('product_id'));
+        
+        /*--------------- Menghitung rata-rata MAE ---------------*/
+        $averageMAE = $this->hitungMAE([],'');
+
+        /*--------------- Menampilkan Data -------------*/
         if($tableSimilarity){
             $arraySimilarity = '';
             $no = 1;
@@ -162,10 +170,71 @@ class MethodController extends Controller
                     'status'            => 'Success',
                     'table_similarity'  => '<table class="table table-small table-bordered table-hover">'.$arraySimilarity.'</table>',
                     'table_prediction'  => $arrayPrediksi,
+                    'MAE' => $MAE,
+                    'average_MAE' => $averageMAE
                 ],
                 200
             );
         }
+    }
+
+    function hitungMAE($customer_id,$product_id){
+        $dataCustomer   = DB::table('customers')
+                    ->select(
+                        [
+                            'id as data_id',
+                        ]
+                    )->where($customer_id)->get();
+        // memperbarui prediksi
+        Prediction::query()->truncate();
+        foreach($dataCustomer as $c){
+            $dataProduct = DB::select(DB::raw("
+                SELECT 
+                    r.customer_id as customer_id, p.id as product_id 
+                FROM 
+                    products p
+                INNER JOIN 
+                    reviews r ON p.id = r.product_id AND r.customer_id = ".$c->data_id."
+            "));
+            $arrayPrediksiMAE = [];
+            foreach($dataProduct as $value){
+                if($product_id == '' || $value->product_id == $product_id){
+                    $prediction = DB::select(DB::raw("
+                    SELECT
+                        (SUM(r.rating*s.similarity) / SUM(ABS(s.similarity))) as prediction 
+                    from
+                        (SELECT product_id_1, product_id_2, similarity from similarities where similarity > 0) s,
+                        (SELECT customer_id, product_id, rating 
+                        FROM reviews
+                        where customer_id = ".$c->data_id.") r	
+                    where 
+                        (s.product_id_1 = ".$value->product_id." AND  s.product_id_2 = r.product_id) XOR (s.product_id_1 = r.product_id AND s.product_id_2 = ".$value->product_id.")
+                    "));
+                    $arrayPrediksiMAE[] = [
+                        'product_id' => $value->product_id,
+                        'prediksi' => $prediction[0]->prediction
+                    ];
+                
+                    $data   = new Prediction;
+                    $data->customer_id   = $c->data_id;
+                    $data->product_id   = $value->product_id;
+                    $data->prediction     = $prediction[0]->prediction;
+                    $data->save();
+                }
+            }
+        }
+        $dataMAE = DB::select(DB::raw("
+            SELECT
+                SUM(ABS(p.prediction-r.rating))/COUNT(*) as MAE
+            FROM 
+                prediction_for_mae p, reviews r 
+            WHERE
+                p.customer_id = r.customer_id AND p.product_id = r.product_id
+        "));
+        foreach($dataMAE as $value){
+            $MAE = $value->MAE;
+        }
+        return $MAE;
     }
 
     function getprdName($id) {
