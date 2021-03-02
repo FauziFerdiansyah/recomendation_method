@@ -26,7 +26,7 @@ class MethodController extends Controller
         
 		/*----------- Membuat Similarity -----------*/
 
-		//Mendapatkan data produk apa saja yang dirating
+		// Mendapatkan data produk apa saja yang dirating
         $fullProduct = DB::table('reviews')->select("product_id")->groupBy('product_id')->get();
 
         // memperbarui similarity
@@ -117,7 +117,8 @@ class MethodController extends Controller
 				r.product_id IS NULL
 		"));
 
-        $arrayPrediksi = '<table class="table table-small table-bordered table-hover"><tr><th>Product Name</th><th>Prediction</th></tr>';
+        // Buat array prediksi
+        $arrayPrediksi = [];
 		foreach($dataProduct as $value){
 			$prediction = DB::select(DB::raw("
 			SELECT
@@ -130,14 +131,27 @@ class MethodController extends Controller
 			where 
 				(s.product_id_1 = ".$value->product_id." AND  s.product_id_2 = r.product_id) XOR (s.product_id_1 = r.product_id AND s.product_id_2 = ".$value->product_id.")
                 AND s.similarity >= 0
+                order by (SUM(r.rating*s.similarity) / SUM(ABS(s.similarity))) asc
 			"));
-            // $arrayPrediksi[] = [
-            //     'product_id' => $value->product_id,
-            //     'prediksi' => $prediction[0]->prediction
-            // ];
-            $arrayPrediksi .= '<tr><td>'.$this->getprdName($value->product_id).'</td><td>'.$prediction[0]->prediction.'</td></tr>';
+            $arrayPrediksi[] = [
+                'product_id' => $value->product_id,
+                'prediksi' => $prediction[0]->prediction
+            ];
 		}
-        $arrayPrediksi .= '</table>';
+        
+        // Sort prediksi descending
+        usort($arrayPrediksi, function($a, $b) {
+            return $a['prediksi'] + $b['prediksi'];
+        });
+
+        // Buat table prediksi
+        $tablePrediksi = '<table class="table table-small table-bordered table-hover"><tr><th>Product Name</th><th>Prediction</th></tr>';
+        foreach($arrayPrediksi as $r){
+            if($r['product_id'] != $request->input('customer_id')){
+                $tablePrediksi .= '<tr><td>'.$this->getprdName($r['product_id']).'</td><td>'.$r['prediksi'].'</td></tr>';
+            }
+        }
+        $tablePrediksi .= '</table>';
         
         /*--------------- Menghitung rata-rata MAE ---------------*/
         $averageMAE = $this->hitungMAE([],'');
@@ -148,6 +162,7 @@ class MethodController extends Controller
         if($tableSimilarity){
             $arraySimilarity = '';
             $no = 1;
+            /*--------------- Buat table similarity -------------*/
             foreach ($tableSimilarity as $keyth => $th) {
                 $arr_th_sm = '';
                 $no2 = 1;
@@ -168,7 +183,7 @@ class MethodController extends Controller
                 [
                     'status'            => 'Success',
                     'table_similarity'  => '<table class="table table-small table-bordered table-hover">'.$arraySimilarity.'</table>',
-                    'table_prediction'  => $arrayPrediksi,
+                    'table_prediction'  => $tablePrediksi,
                     'MAE' => $MAE,
                     'average_MAE' => $averageMAE
                 ],
