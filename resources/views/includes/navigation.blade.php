@@ -11,11 +11,6 @@
                 <i class="mr-2" data-feather="smile"></i> Users
             </a>
         </li>
-        <li class="{{ Request::segment(2) === 'categories' ? 'open' : '' }}">
-            <a href="{{ route('category_index') }}">
-                <i class="mr-2" data-feather="slack"></i> Categories
-            </a>
-        </li>
         <li class="{{ Request::segment(2) === 'products' ? 'open' : '' }}">
             <a href="{{ route('product_index') }}">
                 <i class="mr-2" data-feather="package"></i> Products

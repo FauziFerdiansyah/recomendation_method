@@ -26,20 +26,6 @@ Create New Product
             </div>
           </div>
           <div class="row">
-            <div class="col-md-6 form-group {{ $errors->has('category_id') ? 'has-error' : '' }}">
-              <label for="category_Input">Category</label>
-                <select name="category_id" id="category_Input" class="form-control" required>
-                  <option value="">- Select Category -</option>
-                  @foreach($list_category as $key => $value)
-                      option
-                      <option value="{{ $key }}" @if($key == old('category_id') ) selected @endif>
-                          {{ $value}}
-                      </option>
-                  @endforeach
-                </select>
-            </div>  
-          </div>
-          <div class="row">
             <div class="col-md-9 form-group {{ $errors->has('image') ? 'has-error' : '' }}">
               <label for="image_Input">Image Product</label>
                   <input type="file" name="image" class="form-control" value="{{ old('image') ?: '' }}" id="image_Input" required>

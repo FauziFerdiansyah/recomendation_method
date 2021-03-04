@@ -12,7 +12,7 @@ class Product extends Model
 	public static $rules = [
         'name'	=> 'required|max:45|unique:products,name',
         'image' => 'required|mimes:jpg,jpeg,bmp,png,gif|max:1024',
-        'category_id'  => 'required',
+        // 'category_id'  => 'required',
         'image'  => 'required',
         'price'  => 'required',
         'weight'  => 'required',
@@ -24,7 +24,7 @@ class Product extends Model
         return array(
             'name'	=> 'required|max:45|unique:products,name,'.$id,
             'image' => 'required|mimes:jpg,jpeg,bmp,png,gif|max:1024',
-            'category_id'  => 'required',
+            // 'category_id'  => 'required',
             'image'  => 'required',
             'price'  => 'required',
             'weight'  => 'required',

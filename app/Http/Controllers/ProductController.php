@@ -23,8 +23,9 @@ class ProductController extends Controller
 
     public function create()
     {
-        $list_category      = DB::table('categories')->pluck('name', 'id'); 
-        return view('pages.products.create')->with(compact('list_category'));
+        // $list_category      = DB::table('categories')->pluck('name', 'id'); 
+        // return view('pages.products.create')->with(compact('list_category'));
+        return view('pages.products.create');
     }
 
     public function store(Request $request)
@@ -46,7 +47,7 @@ class ProductController extends Controller
 
             $data   = new Product;
             $data->name         = $request->input('name');
-            $data->category_id  = $request->input('category_id');
+            // $data->category_id  = $request->input('category_id');
             $data->price        = $request->input('price');
             $data->weight       = $request->input('weight');
             $data->description  = $request->input('description');
@@ -74,9 +75,11 @@ class ProductController extends Controller
     public function edit($id)
     {
         $data = Product::findOrFail($id);
-        $list_category     = DB::table('categories')->pluck('name', 'id');  
+        // $list_category     = DB::table('categories')->pluck('name', 'id');  
+        // return view('pages.products.edit')
+        //     ->with(compact('data', 'list_category'));
         return view('pages.products.edit')
-            ->with(compact('data', 'list_category'));
+            ->with(compact('data'));
     }
 
     public function update(Request $request, $id)
@@ -106,7 +109,7 @@ class ProductController extends Controller
                 ->update(
                     [
                         'name'          => $request->input('name'),
-                        'category_id'   => $request->input('category_id'),
+                        // 'category_id'   => $request->input('category_id'),
                         'price'         => $request->input('price'),
                         'weight'        => $request->input('weight'),
                         'image'         => $allowed_filename,
@@ -138,7 +141,7 @@ class ProductController extends Controller
                         [
                             'products.id as data_id',
                             'products.name as product_name',
-                            'categories.name as category',
+                            // 'categories.name as category',
                             'products.image',
                             'products.price',
                             'products.weight',
@@ -147,7 +150,7 @@ class ProductController extends Controller
                             'products.updated_at'
                         ]
                     )
-                    ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
+                    // ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
                     ->orderBy('updated_at', 'desc');
         return Datatables::of($data)
                 ->addColumn('actions', function($r_data) {
@@ -170,8 +173,10 @@ class ProductController extends Controller
                 ->edit_column('price', function($r_data) {
                     return "
                         <dl class='row'>
-                            <dt class='col-sm-5'>Category :</dt>
-                            <dd class='col-sm-7'>".$r_data->category."</dd>
+                            ".
+                            //<dt class='col-sm-5'>Category :</dt>
+                            ''//<dd class='col-sm-7'>".$r_data->category."</dd>
+                            ."
                             <dt class='col-sm-5'>Price :</dt>
                             <dd class='col-sm-7'>".rupiah_format($r_data->price)."</dd>
                             <dt class='col-sm-5'>Weight :</dt>
