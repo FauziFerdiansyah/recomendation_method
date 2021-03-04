@@ -39,7 +39,7 @@
                         <div class="p-3 border-top text-right">
                             <a href="{{ route('logout') }}" onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();" 
-                                class="btn btn-primary btn-block mt-2">
+                                class="btn btn-primary btn-block mt-2 text-white">
                                 Sign Out <i class="ti-shift-right ml-2"></i>
                             </a>
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">

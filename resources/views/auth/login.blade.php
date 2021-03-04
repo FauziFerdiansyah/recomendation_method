@@ -5,7 +5,7 @@
 
     <!-- logo -->
     <div id="logo">
-        <img class="logo" src="{{URL::asset('/img/logo.png')}}" alt="image">
+        <img class="logo" width="180px" src="{{URL::asset('/img/logo-big.png')}}" alt="image">
     </div>
     <!-- ./ logo -->
 

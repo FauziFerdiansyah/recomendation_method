@@ -32,7 +32,7 @@ Create New Review
                 </span>
               @endif
             </div>
-          <button type="button" class="btn btn-primary mb-2 ml-sm-0 ml-0 ml-md-1" onclick="execMethod()">Get Recomendation</button>
+          <button type="button" class="btn btn-primary mb-2 ml-sm-0 ml-0 ml-md-1" onclick="execMethod(this)">Get Recomendation</button>
         </form>
 
       </div>
@@ -172,31 +172,48 @@ Create New Review
         }
       }));
 
-      function execMethod() {
+      function execMethod(this_) {
+          var btn_ = $(this_);
           $.ajax({
             url: "{{ route('method_store') }}",
             type: "POST",
             dataType: 'json',
             data: $('#form-data').serialize(),
             beforeSend: function() {
-                
+                var data_load = '<center><span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>Loading...</center>';
+                var btn_load = '<div class="spinner-border spinner-border-sm" role="status"><span class="sr-only">Loading...</span></div>';
+                $('#table-similarity').html(data_load);
+                $('#table-prediction').html(data_load);
+                $('#table-mae').html(data_load);
+                btn_.prop('disabled', true);
+                btn_.html(btn_load);
             }
           }).done(function (data, textStatus, jqXHR){
+            var empty_data = '<center>Data is empety</center>';
             if(data.table_similarity){
               $('#table-similarity').html(data.table_similarity);
+            }else{
+              $('#table-similarity').html(empty_data);
             }
             if(data.table_prediction){
               $('#table-prediction').html(data.table_prediction);
+            }else{
+              $('#table-similarity').html(empty_data);
             }
-            if(data.MAE){
+            if(data.MAE || data.MAE === 0){
               $('#table-mae').html(data.MAE);
+            }else{
+              $('#table-similarity').html(empty_data);
             }
             if(data.MAE == null){
               $('#table-mae').html('<div class="alert alert-danger" role="alert">Produk ini belum dirating oleh customer, sehingga MAE tidak tersedia.</div>');
             }
           })
           .fail()
-          .always();
+          .always(function (){
+            btn_.prop('disabled', false);
+            btn_.html("Get Recomendation");
+          });
       }
     </script>
 @endpush
