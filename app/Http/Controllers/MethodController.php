@@ -133,10 +133,12 @@ class MethodController extends Controller
                 AND s.similarity >= 0
                 order by (SUM(r.rating*s.similarity) / SUM(ABS(s.similarity))) asc
 			"));
-            $arrayPrediksi[] = [
-                'product_id' => $value->product_id,
-                'prediksi' => $prediction[0]->prediction
-            ];
+            if($value->product_id != $request->input('product_id')){
+                $arrayPrediksi[] = [
+                    'product_id' => $value->product_id,
+                    'prediksi' => $prediction[0]->prediction
+                ];
+            }
 		}
         
         // Sort prediksi descending
@@ -147,9 +149,7 @@ class MethodController extends Controller
         // Buat table prediksi
         $tablePrediksi = '<table class="table table-small table-bordered table-hover"><tr><th>Product Name</th><th>Prediction</th></tr>';
         foreach($arrayPrediksi as $r){
-            if($r['product_id'] != $request->input('customer_id')){
-                $tablePrediksi .= '<tr><td>'.$this->getprdName($r['product_id']).'</td><td>'.$r['prediksi'].'</td></tr>';
-            }
+            $tablePrediksi .= '<tr><td>'.$this->getprdName($r['product_id']).'</td><td>'.$r['prediksi'].'</td></tr>';
         }
         $tablePrediksi .= '</table>';
         
