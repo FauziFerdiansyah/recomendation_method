@@ -65,6 +65,20 @@ Create New Review
             </div>
         </div>
     </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="d-block">
+                <h6 class="card-title mb-3">MAE Product <i class="fa fa-info-circle text-info" title="Mean absolute error (MAE) adalah formula yang digunakan untuk menghitung tingkat akurasi atau besar error hasil prediksi rating dari sistem terhadap rating yang sebenarnya yang user berikan terhadap suatu item (Ricci et.al., 2011). Dari MAE yang dihasilkan akan ditarik kesimpulan dengan asumsi jika MAE semakin mendekati 0 maka hasil prediksi akan semakin akurat." data-toggle="tooltip" style="cursor:pointer"></i></h6>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="table-responsive" id="table-mae">
+                      <center>Data is empety</center>
+                    </div> 
+                </div>
+            </div>
+        </div>
+    </div>
   </div>
 </div>
 @endsection
@@ -173,6 +187,12 @@ Create New Review
             }
             if(data.table_prediction){
               $('#table-prediction').html(data.table_prediction);
+            }
+            if(data.MAE){
+              $('#table-mae').html(data.MAE);
+            }
+            if(data.MAE == null){
+              $('#table-mae').html('<div class="alert alert-danger" role="alert">Produk ini belum dirating oleh customer, sehingga MAE tidak tersedia.</div>');
             }
           })
           .fail()
