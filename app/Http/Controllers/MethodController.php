@@ -67,15 +67,16 @@ class MethodController extends Controller
 						where 
 							item1.customer_id = item2.customer_id
 					"));
-
-                        $data   = new Similarity;
-                        $data->product_id_1   = $value1->product_id;
-                        $data->product_id_2   = $value2->product_id;
-                        $data->similarity     = $query[0]->similarity;
-                        $dataSimilarity[$value1->product_id][$value2->product_id] = [
-                            'similarity' => $query[0]->similarity
-                        ];
-                        $data->save();
+                        if($query[0]->similarity != null){
+                            $data   = new Similarity;
+                            $data->product_id_1   = $value1->product_id;
+                            $data->product_id_2   = $value2->product_id;
+                            $data->similarity     = $query[0]->similarity;
+                            $dataSimilarity[$value1->product_id][$value2->product_id] = [
+                                'similarity' => $query[0]->similarity
+                            ];
+                            $data->save();
+                        }
 				}
 			}
 		}
@@ -178,14 +179,57 @@ class MethodController extends Controller
                 $arraySimilarity .= '<tr>'.$arr_th_sm.'</tr>';
                 $no++;
             }
+
+            /*----------------- Buat table Review ------------------*/
+            $dataProduct   = DB::table('products')
+            ->select(
+                [
+                    'id as product_id',
+                    'name',
+                    'total_rating',
+                    'total_vote'
+                ]
+            )->get();
+            $dataCustomer   = DB::table('customers')
+                    ->select(
+                        [
+                            'id as customer_id',
+                            'name'
+                        ]
+                    )->get();
+            $tableReview = '<tr><th>#</th>';
+            foreach($dataCustomer as $c){
+                $tableReview .= '<th>'.$c->name.' ('.$c->customer_id.')</th>';
+            }
+            $tableReview .= '<th>Average Product</th></tr>';
+
+            foreach($dataProduct as $p){
+                $tableReview .= '<tr><th>'.$p->name.' ('.$p->product_id.')</th>';
+                foreach($dataCustomer as $c){
+                    // Mendapatkan data review semua product per semua customer
+                    $dataRating   = DB::table('reviews')
+                                        ->select(
+                                            [
+                                                'rating',
+                                            ]
+                                        )->where(['product_id'=>$p->product_id,'customer_id'=>$c->customer_id])->first();
+                    if($dataRating){
+                        $tableReview .= '<td>'.$dataRating->rating.'</td>';
+                    }else{
+                        $tableReview .= '<td></td>';
+                    }
+                }
+                $tableReview .= '<td>'.($p->total_rating/$p->total_vote).'</td></tr>';
+            }
             
             return response()->json(
                 [
                     'status'            => 'Success',
+                    'table_review'      => '<table class="table table-small table-bordered table-hover text-center">'.$tableReview.'</table>',
                     'table_similarity'  => '<table class="table table-small table-bordered table-hover">'.$arraySimilarity.'</table>',
                     'table_prediction'  => $tablePrediksi,
-                    'MAE' => $MAE,
-                    'average_MAE' => $averageMAE
+                    'MAE'               => $MAE,
+                    'average_MAE'       => $averageMAE
                 ],
                 200
             );
@@ -228,12 +272,13 @@ class MethodController extends Controller
                         'product_id' => $value->product_id,
                         'prediksi' => $prediction[0]->prediction
                     ];
-                
-                    $data   = new Prediction;
-                    $data->customer_id   = $c->data_id;
-                    $data->product_id   = $value->product_id;
-                    $data->prediction     = $prediction[0]->prediction;
-                    $data->save();
+                    if($prediction[0]->prediction != null){
+                        $data   = new Prediction;
+                        $data->customer_id   = $c->data_id;
+                        $data->product_id   = $value->product_id;
+                        $data->prediction     = $prediction[0]->prediction;
+                        $data->save();
+                    }
                 }
             }
         }

@@ -34,8 +34,21 @@ Create New Review
             </div>
           <button type="button" class="btn btn-primary mb-2 ml-sm-0 ml-0 ml-md-1" onclick="execMethod(this)">Get Recomendation</button>
         </form>
-
       </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="d-block">
+                <h6 class="card-title mb-3">Review Product</h6>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="table-responsive" id="table-review">
+                      <center>Data is empety</center>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="card">
         <div class="card-body">
@@ -183,6 +196,7 @@ Create New Review
                 var data_load = '<center><span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>Loading...</center>';
                 var btn_load = '<div class="spinner-border spinner-border-sm" role="status"><span class="sr-only">Loading...</span></div>';
                 $('#table-similarity').html(data_load);
+                $('#table-review').html(data_load);
                 $('#table-prediction').html(data_load);
                 $('#table-mae').html(data_load);
                 btn_.prop('disabled', true);
@@ -190,6 +204,11 @@ Create New Review
             }
           }).done(function (data, textStatus, jqXHR){
             var empty_data = '<center>Data is empety</center>';
+            if(data.table_review){
+              $('#table-review').html(data.table_review);
+            }else{
+              $('#table-review').html(empty_data);
+            }
             if(data.table_similarity){
               $('#table-similarity').html(data.table_similarity);
             }else{
@@ -203,7 +222,7 @@ Create New Review
             if(data.MAE || data.MAE === 0){
               $('#table-mae').html(data.MAE);
             }else{
-              $('#table-similarity').html(empty_data);
+              $('#table-mae').html(empty_data);
             }
             if(data.MAE == null){
               $('#table-mae').html('<div class="alert alert-danger" role="alert">Produk ini belum dirating oleh customer, sehingga MAE tidak tersedia.</div>');
