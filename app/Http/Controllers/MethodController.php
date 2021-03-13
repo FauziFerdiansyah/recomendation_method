@@ -219,7 +219,11 @@ class MethodController extends Controller
                         $tableReview .= '<td></td>';
                     }
                 }
-                $tableReview .= '<td>'.($p->total_rating/$p->total_vote).'</td></tr>';
+                if($p->total_rating != 0 and $p->total_vote != 0){
+                    $tableReview .= '<td>'.($p->total_rating/$p->total_vote).'</td></tr>';
+                }else{
+                    $tableReview .= '<td></td></tr>';
+                }
             }
             
             return response()->json(
