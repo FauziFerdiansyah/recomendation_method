@@ -134,7 +134,7 @@ class MethodController extends Controller
                 AND s.similarity >= 0
                 order by (SUM(r.rating*s.similarity) / SUM(ABS(s.similarity))) asc
 			"));
-            if($value->product_id != $request->input('product_id')){
+            if($value->product_id != $request->input('product_id') && $prediction[0]->prediction != ""){
                 $arrayPrediksi[] = [
                     'product_id' => $value->product_id,
                     'prediksi' => $prediction[0]->prediction
