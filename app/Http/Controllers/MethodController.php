@@ -180,6 +180,10 @@ class MethodController extends Controller
                 $no++;
             }
 
+            $ratingUser = "";
+            $username = "";
+            $productSelected = "";
+            
             /*----------------- Buat table Review ------------------*/
             $dataProduct   = DB::table('products')
             ->select(
@@ -201,7 +205,7 @@ class MethodController extends Controller
             foreach($dataCustomer as $c){
                 $tableReview .= '<th>'.$c->name.' ('.$c->customer_id.')</th>';
             }
-            $tableReview .= '<th>Average Product</th></tr>';
+            $tableReview .= '<th>Average Rating</th></tr>';
 
             foreach($dataProduct as $p){
                 $tableReview .= '<tr><th>'.$p->name.' ('.$p->product_id.')</th>';
@@ -215,6 +219,11 @@ class MethodController extends Controller
                                         )->where(['product_id'=>$p->product_id,'customer_id'=>$c->customer_id])->first();
                     if($dataRating){
                         $tableReview .= '<td>'.$dataRating->rating.'</td>';
+                        if($c->customer_id == $request->input('customer_id') && $p->product_id == $request->input('product_id')){
+                            $ratingUser = $dataRating->rating;
+                            $username = $c->name;
+                            $productSelected = $p->name;
+                        }
                     }else{
                         $tableReview .= '<td></td>';
                     }
@@ -232,8 +241,12 @@ class MethodController extends Controller
                     'table_review'      => '<table class="table table-small table-bordered table-hover text-center">'.$tableReview.'</table>',
                     'table_similarity'  => '<table class="table table-small table-bordered table-hover">'.$arraySimilarity.'</table>',
                     'table_prediction'  => $tablePrediksi,
-                    'MAE'               => $MAE,
-                    'average_MAE'       => $averageMAE
+                    'MAE'               => $MAE['MAE'],
+                    'average_MAE'       => $averageMAE,
+                    'rating_user'       => $ratingUser,
+                    'username'          => $username,
+                    'product_selected'  => $productSelected,
+                    'rating_by_system'  => $MAE['prediction']
                 ],
                 200
             );
@@ -241,6 +254,7 @@ class MethodController extends Controller
     }
 
     function hitungMAE($customer_id,$product_id){
+        $prediction = "";
         $dataCustomer   = DB::table('customers')
                     ->select(
                         [
@@ -282,6 +296,7 @@ class MethodController extends Controller
                         $data->product_id   = $value->product_id;
                         $data->prediction     = $prediction[0]->prediction;
                         $data->save();
+                        $prediction = $data->prediction;
                     }
                 }
             }
@@ -297,7 +312,10 @@ class MethodController extends Controller
         foreach($dataMAE as $value){
             $MAE = $value->MAE;
         }
-        return $MAE;
+        return [
+            'MAE' => $MAE,
+            'prediction' => $prediction
+        ];
     }
 
     function getprdName($id) {

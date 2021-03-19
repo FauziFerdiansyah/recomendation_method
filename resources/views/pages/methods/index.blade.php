@@ -53,7 +53,8 @@ Create New Review
     <div class="card">
         <div class="card-body">
             <div class="d-block">
-                <h6 class="card-title mb-3">Similarity Product</h6>
+                <h6 class="card-title mb-3">Similarity Product (Pearson correlation)</h6>
+                <div class="alert alert-info">Pendekatan Pearson correlation adalah sebuah metode yang dikembangkan oleh Karl Pearson. Korelasi (correlation) adalah sebuah teknik pengukuran yang menentukan seberapa dekat relasi antar dua himpunan bilangan yang berbeda.</div>
             </div>
             <div class="row">
                 <div class="col-md-12">
@@ -68,6 +69,7 @@ Create New Review
         <div class="card-body">
             <div class="d-block">
                 <h6 class="card-title mb-3">Prediction</h6>
+                <div class="alert alert-info">Perhitungan prediksi digunakan untuk memprediksi nilai rating yang diberikan oleh user untuk item tertentu.</div>
             </div>
             <div class="row">
                 <div class="col-md-12">
@@ -81,10 +83,15 @@ Create New Review
     <div class="card">
         <div class="card-body">
             <div class="d-block">
-                <h6 class="card-title mb-3">MAE Product <i class="fa fa-info-circle text-info" title="Mean absolute error (MAE) adalah formula yang digunakan untuk menghitung tingkat akurasi atau besar error hasil prediksi rating dari sistem terhadap rating yang sebenarnya yang user berikan terhadap suatu item (Ricci et.al., 2011). Dari MAE yang dihasilkan akan ditarik kesimpulan dengan asumsi jika MAE semakin mendekati 0 maka hasil prediksi akan semakin akurat." data-toggle="tooltip" style="cursor:pointer"></i></h6>
+                <h6 class="card-title mb-3">MAE Product</h6>
+                <div class="alert alert-info">Mean absolute error (MAE) adalah formula yang digunakan untuk menghitung tingkat akurasi atau besar error hasil prediksi rating dari sistem terhadap rating yang sebenarnya yang user berikan terhadap suatu item (Ricci et.al., 2011). Dari MAE yang dihasilkan akan ditarik kesimpulan dengan asumsi jika MAE semakin mendekati 0 maka hasil prediksi akan semakin akurat.</div>
             </div>
             <div class="row">
                 <div class="col-md-12">
+                    <div id="rating-user">
+                    </div>
+                    <div id="rating-by-system">
+                    </div>
                     <div class="table-responsive" id="table-mae">
                       <center>Data is empety</center>
                     </div> 
@@ -220,9 +227,13 @@ Create New Review
               $('#table-similarity').html(empty_data);
             }
             if(data.MAE || data.MAE === 0){
-              $('#table-mae').html(data.MAE);
+              $('#table-mae').html(`<span>MAE : <b>${data.MAE}</b>`);
+              $('#rating-user').html(`<span>Rating product <i>${data.product_selected}</i> by ${data.username} : <b>${data.rating_user}</b></span>`);
+              $('#rating-by-system').html(`<span>Rating product <i>${data.product_selected}</i> by System : <b>${data.rating_by_system}</b></span>`);
             }else{
               $('#table-mae').html(empty_data);
+              $('#rating-user').html(``);
+              $('#rating-by-system').html(``);
             }
             if(data.MAE == null){
               $('#table-mae').html('<div class="alert alert-danger" role="alert">Produk ini belum dirating oleh customer, sehingga MAE tidak tersedia.</div>');
