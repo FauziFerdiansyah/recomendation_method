@@ -11,6 +11,8 @@ use DB;
 use Validator;
 use Yajra\Datatables\Datatables;
 use App\Customer;
+use App\Product;
+use App\Review;
 class CustomerController extends Controller
 {
 
@@ -87,6 +89,36 @@ class CustomerController extends Controller
         }
     }
 
+    private function updateRating($id_product, $rating, $type) {
+        $get_review_count = DB::table('reviews')->where('product_id', $id_product)->count();
+
+        $getCountVote = ($get_review_count > 0)? $get_review_count : 0;
+        $get_product = DB::table('products')
+                ->where('id', $id_product)->first();
+        if($type == 1){ // Add
+            Product::where('id', $id_product)
+            ->update(
+                [
+                    'total_vote'    => ($getCountVote),
+                    'total_rating'  => ($get_product->total_rating + $rating)
+                ]);
+        }elseif($type == 2){ // Edit
+            Product::where('id', $id_product)
+            ->update(
+                [
+                    'total_vote'    => ($getCountVote),
+                    'total_rating'  => ($rating)
+                ]);
+        }else{
+            Product::where('id', $id_product)
+            ->update(
+                [
+                    'total_vote'    => ($getCountVote),
+                    'total_rating'  => ($get_product->total_rating - $rating)
+                ]);
+        }
+    }
+
      /**
      *
      * AJAX AREA
@@ -136,6 +168,7 @@ class CustomerController extends Controller
 
     public function ajaxDelete($id)
     {
+        $idCst = $id;
         $data = Customer::findOrFail($id);
         if($data == null) {
             return response()->json([
@@ -144,7 +177,17 @@ class CustomerController extends Controller
                 'code' => 200,
                 'success' => false
             ], 200);
-        }else if(Customer::destroy($id)) {
+        }else if(Customer::destroy($idCst)) {
+            $ReviewBySuctomer = Review::where('reviews.customer_id', $idCst)
+            ->select('reviews.product_id', 'reviews.rating')
+            ->get();
+            foreach ($ReviewBySuctomer as $key => $v) {
+                $RemoveCustomerRating = Review::where('customer_id', $idCst)->delete();
+                $this->updateRating(
+                    $v->product_id, $v->rating, 3
+                );
+                
+            }
           return response()->json([
                 'status' => true,
                 'message' => "<b>".$data->name."</b>" . " has been deleted.",
