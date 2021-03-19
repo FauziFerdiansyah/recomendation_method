@@ -12,7 +12,7 @@
     <!-- FavIcons -->
     
     <!-- favicon -->
-    <link rel="shortcut icon" href="{{ asset('img/favicon.png') }}" /> 
+    <link rel="shortcut icon" href="{{ asset('img/fav.png') }}" /> 
     <!-- END FavIcons -->
 
     <!-- CSRF Token -->

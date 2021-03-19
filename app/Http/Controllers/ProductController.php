@@ -11,6 +11,7 @@ use DB;
 use Validator;
 use Yajra\Datatables\Datatables;
 use App\Product;
+use App\Review;
 use Illuminate\Support\Facades\File;
 use Intervention\Image\ImageManager;
 class ProductController extends Controller
@@ -161,7 +162,7 @@ class ProductController extends Controller
                         </button>
                         <div class="dropdown-menu">
                             <a class="dropdown-item text-info" href="'.route('product_edit', $r_data->data_id).'"><span class="ti-pencil mr-2"></span> Edit</a>
-                            <a class="dropdown-item text-danger" href="javascript:void(0)" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#delete_form' . $r_data->data_id . '" onclick="deleteModal(' . "'" . route('product_destroy', $r_data->data_id) . "','" . $r_data->data_id . "','" . $r_data->image . "','" . Session::token() . "'" . ')"><span class="ti-trash mr-2"></span> Delete</a>
+                            <a class="dropdown-item text-danger" href="javascript:void(0)" data-toggle="modal" data-backdrop="static" data-keyboard="false" data-target="#delete_form' . $r_data->data_id . '" onclick="deleteModal(' . "'" . route('product_destroy', $r_data->data_id) . "','" . $r_data->data_id . "','" . $r_data->product_name . "','" . Session::token() . "'" . ')"><span class="ti-trash mr-2"></span> Delete</a>
                         </div>
                         <div id="area_modal' . $r_data->data_id . '"></div>
                     </div>
@@ -215,6 +216,7 @@ class ProductController extends Controller
                 'success' => false
             ], 200);
         }else if(Product::destroy($id)) {
+                $removeALlReviewThisProducts = Review::where('product_id', $id)->delete();
           return response()->json([
                 'status' => true,
                 'message' => "<b>".$data->name."</b>" . " has been deleted.",
