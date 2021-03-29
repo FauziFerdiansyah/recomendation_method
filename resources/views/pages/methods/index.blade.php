@@ -236,7 +236,12 @@ Create New Review
               $('#rating-by-system').html(``);
             }
             if(data.MAE == null){
-              $('#table-mae').html('<div class="alert alert-danger" role="alert">Produk ini belum dirating oleh customer, sehingga MAE tidak tersedia.</div>');
+              if(data.rating_user != ""){
+                $('#table-mae').html(`<div class="alert alert-danger" role="alert">MAE tidak tersedia karena produk yang dirating oleh customer ${data.username} tidak memiliki kesamaan (<i>Similarity</i>) dengan produk yang pilih.</div>`);
+              }else{
+              $('#table-mae').html(`<div class="alert alert-danger" role="alert">MAE tidak tersedia karena produk yang dipilih belum dirating oleh customer ${data.username}.</div>`);
+
+              }
             }
           })
           .fail()

@@ -234,6 +234,16 @@ class MethodController extends Controller
                     $tableReview .= '<td></td></tr>';
                 }
             }
+
+            if($username == ''){
+                $username   = DB::table('customers')
+                    ->select(
+                        [
+                            'id as customer_id',
+                            'name'
+                        ]
+                    )->where('id',$request->input('customer_id'))->first()->name;
+            }
             
             return response()->json(
                 [
